@@ -1,4 +1,4 @@
-// Radar RI - sync diario: Google Sheets (cotacoes + quantidade de acoes) e FRED (US5Y/US10Y) -> Supabase
+// IRM Meliuz - sync diario: Google Sheets (cotacoes + quantidade de acoes) e FRED (US5Y/US10Y) -> Supabase
 //
 // Roda via `npm run sync`. Precisa das variaveis de ambiente descritas em .env.example
 // (localmente via arquivo .env, em producao via Secrets do GitHub Actions).
@@ -270,7 +270,7 @@ async function upsertInChunks(table, rows, conflictKeys, chunkSize = 500) {
 }
 
 async function main() {
-  console.log("== Radar RI: sync de dados de mercado ==");
+  console.log("== IRM Meliuz: sync de dados de mercado ==");
 
   console.log("[1/3] Baixando aba de cotacoes...");
   const cotacoesRows = await fetchSheetCsv(SHEET_GID_COTACOES);

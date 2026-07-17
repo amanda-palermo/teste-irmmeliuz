@@ -1,4 +1,4 @@
-# Radar RI — Painel CASH3 (Méliuz)
+# IRM Méliuz — Painel CASH3
 
 Site de relações com investidores da Méliuz. Nesta primeira fase, só a tela
 **Painel CASH3 > Visão geral** está implementada com dados reais. As telas de
@@ -67,7 +67,7 @@ https://fred.stlouisfed.org/docs/api/api_key.html).
 Sem precisar instalar Git nem usar linha de comando:
 
 1. Abra o seu repositório em github.com → botão **Add file → Upload files**.
-2. Arraste a pasta **inteira** `radar ri` (ou todo o conteúdo dela) para a
+2. Arraste a pasta **inteira** `irm meliuz` (ou todo o conteúdo dela) para a
    área de upload. O GitHub recria a estrutura de pastas sozinho a partir do
    que você arrastar.
 3. **Atenção especial à pasta `.github/workflows/`** — como o nome começa

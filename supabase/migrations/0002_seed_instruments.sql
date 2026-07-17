@@ -1,4 +1,4 @@
--- Radar RI - seed de instrumentos e quantidade de acoes
+-- IRM Meliuz - seed de instrumentos e quantidade de acoes
 -- Rode depois do 0001_init.sql. E seguro rodar de novo (idempotente).
 
 insert into public.instruments (ticker, display_name, category, kind, exchange, currency, sort_order) values

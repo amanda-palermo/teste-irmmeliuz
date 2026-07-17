@@ -1,4 +1,4 @@
--- Radar RI - schema inicial (Painel CASH3 > Visao Geral)
+-- IRM Meliuz - schema inicial (Painel CASH3 > Visao Geral)
 -- Rode este arquivo no Supabase (SQL Editor) uma unica vez, na ordem: 0001, depois 0002.
 
 create table if not exists public.instruments (

@@ -1,4 +1,4 @@
-// Radar RI - Painel CASH3 > Visao Geral
+// IRM Meliuz - Painel CASH3 > Visao Geral
 // Le tudo do Supabase (populado pelo GitHub Actions a partir da planilha + FRED).
 // Nao ha nenhum dado mockado aqui: onde a informacao ainda nao existe (base de
 // acionistas, free float), a tela mostra um traco em vez de inventar um numero.

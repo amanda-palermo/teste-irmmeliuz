@@ -1,4 +1,4 @@
--- Radar RI - schema do assistente de IA (base de documentos para RAG)
+-- IRM Meliuz - schema do assistente de IA (base de documentos para RAG)
 -- Rode depois do 0001_init.sql e 0002_seed_instruments.sql. E idempotente.
 -- Uso interno (time de RI): ao contrario das tabelas do Painel CASH3, aqui NAO existe
 -- policy de leitura publica. So o backend do assistente acessa, via service_role key

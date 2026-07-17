@@ -62,7 +62,7 @@
   .theme-toggle-btn{border:none;background:transparent;color:var(--ink-muted);font-size:0.8125rem;padding:8px 14px;cursor:pointer;font-family:inherit;}
   .theme-toggle-btn.active{background:var(--accent);color:#fff;font-weight:600;}
   .theme-toggle-btn:not(.active):hover{background:var(--surface-2);color:var(--ink);}
-  .main{max-width:1400px;}
+  .main{max-width:1400px;min-width:0;}
   h1{font-size:1.375rem;margin:0 0 14px;}
   .page-header{position:sticky;top:0;z-index:10;background:var(--bg);padding:24px 28px 16px;border-bottom:1px solid var(--border);}
   .page-content{padding:20px 28px 28px;}
@@ -82,8 +82,8 @@
   .card-body{padding:14px 16px;}
   .chart-box{position:relative;height:240px;}
   table{width:100%;border-collapse:collapse;font-size:0.8125rem;}
-  th{text-align:left;font-size:0.6875rem;text-transform:uppercase;color:var(--ink-faint);padding:8px 16px;border-bottom:1px solid var(--border);}
-  td{padding:7px 16px;border-bottom:1px solid var(--border);}
+  th{text-align:left;font-size:0.6875rem;text-transform:uppercase;color:var(--ink-faint);padding:8px 10px;border-bottom:1px solid var(--border);}
+  td{padding:7px 10px;border-bottom:1px solid var(--border);}
   td.num{text-align:right;font-family:ui-monospace,monospace;white-space:nowrap;}
   .range-endpoint{cursor:default;}
   .peer-link{color:inherit;text-decoration:none;border-bottom:1px dotted var(--ink-faint);}
@@ -99,9 +99,17 @@
   thead tr:first-child th{text-align:center;}
   thead tr:first-child th:first-child, thead tr:first-child th:nth-child(2){text-align:left;}
   thead tr:first-child th:nth-child(3){text-align:right;}
-  .range-track-cell{min-width:96px;padding-left:16px;padding-right:16px;}
+  .range-track-cell{min-width:64px;padding-left:8px;padding-right:8px;}
   .range-track-cell .range-track{position:relative;height:3px;background:var(--border);border-radius:2px;}
   .range-track-cell .range-dot{position:absolute;top:50%;width:9px;height:9px;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);}
+  #visao-geral-root > .card + .card{margin-top:20px;}
+  .news-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .news-item:last-child{border-bottom:none;}
+  .news-tag{flex:0 0 auto;min-width:64px;padding-top:2px;font-size:0.6875rem;color:var(--ink-faint);white-space:nowrap;}
+  .news-body{flex:1;min-width:0;}
+  .news-title{display:block;color:var(--ink);text-decoration:none;font-weight:600;font-size:0.875rem;}
+  .news-title:hover{color:var(--accent-strong);}
+  .news-source{display:block;font-size:0.75rem;color:var(--ink-faint);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -164,6 +172,11 @@
               <tbody id="peer-table-body"></tbody>
             </table>
           </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">Notícias recentes</div>
+          <div class="card-body" id="news-list"></div>
         </div>
       </div>
     </div>

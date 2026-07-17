@@ -6,6 +6,7 @@
   "description": "Radar RI - painel CASH3 (Meliuz) e assistente de IA para relacoes com investidores",
   "scripts": {
     "sync": "node --env-file-if-exists=.env scripts/sync-market-data.mjs",
+    "sync-news": "node --env-file-if-exists=.env scripts/sync-news.mjs",
     "ingest": "node --env-file-if-exists=.env scripts/ingest-ri-documents.mjs"
   },
   "dependencies": {

@@ -174,6 +174,100 @@ async function fetchSharesHistory(ticker) {
 }
 
 // ---------------------------------------------------------------------------
+// Noticias recentes (Google News RSS, sincronizado 1x/dia - scripts/sync-news.mjs).
+// Nao depende do seletor de data: mostra sempre as mais recentes sincronizadas.
+// ---------------------------------------------------------------------------
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+// Mostra as materias publicadas nos NEWS_WINDOW_DAYS antes da data selecionada no
+// topo da pagina - mesma logica de "viagem no tempo" do resto do painel. Se nao
+// houver nada nesse intervalo (a CASH3 nao sai na midia todo dia), tenta de novo
+// com uma janela mais larga (NEWS_WINDOW_FALLBACK_DAYS) antes de mostrar vazio -
+// sem avisar qual janela encontrou resultado, so mostra a noticia normalmente.
+//
+// Se mesmo assim vier vazio, precisamos distinguir dois motivos bem diferentes:
+// (a) nao teve noticia relevante mesmo naquele periodo - a sincronizacao ja
+//     cobria aquela data, so nao achou nada; ou
+// (b) a data selecionada e anterior a quando o sync de noticias comecou a
+//     rodar - nesse caso "nao ha noticia" seria enganoso, o correto e dizer que
+//     nao temos esse periodo arquivado. Para diferenciar, comparamos a data
+//     selecionada com o inserted_at mais antigo salvo (= dia em que o sync
+//     rodou pela 1a vez).
+//
+// news_mentions pode nao existir ainda (rode a migration 0006); se a tabela
+// faltar, mostra a secao vazia em vez de quebrar a pagina.
+const NEWS_WINDOW_DAYS = 7;
+const NEWS_WINDOW_FALLBACK_DAYS = 14;
+const NEWS_MAX_ITEMS = 10;
+
+let newsSyncStartDate = null; // YYYY-MM-DD do inserted_at mais antigo em news_mentions; null se tabela vazia/inexistente
+
+async function fetchNewsSyncStartDate() {
+  try {
+    const { data, error } = await sb.from("news_mentions").select("inserted_at").order("inserted_at", { ascending: true }).limit(1);
+    if (error) throw error;
+    return data?.[0]?.inserted_at?.slice(0, 10) ?? null;
+  } catch (err) {
+    return null;
+  }
+}
+
+async function fetchNewsWindow(dateIso, days, limit = NEWS_MAX_ITEMS) {
+  const endDate = new Date(`${dateIso}T23:59:59Z`);
+  const startDate = new Date(endDate.getTime() - days * 24 * 60 * 60 * 1000);
+  const { data, error } = await sb
+    .from("news_mentions")
+    .select("title, url, source, published_at")
+    .gte("published_at", startDate.toISOString())
+    .lte("published_at", endDate.toISOString())
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return data ?? [];
+}
+
+async function fetchNews(dateIso) {
+  try {
+    const rows = (await fetchNewsWindow(dateIso, NEWS_WINDOW_DAYS)) || [];
+    if (rows.length) return rows;
+    return await fetchNewsWindow(dateIso, NEWS_WINDOW_FALLBACK_DAYS);
+  } catch (err) {
+    console.warn("[news_mentions] indisponível (rode a migration 0006?):", err.message);
+    return [];
+  }
+}
+
+function fmtNewsDate(iso) {
+  if (!iso) return "";
+  return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(" de ", " ").replace(".", "");
+}
+
+function renderNews(rows, dateIso) {
+  const el = document.getElementById("news-list");
+  if (!el) return;
+  if (!rows.length) {
+    const dataAnteriorAoSync = newsSyncStartDate && dateIso < newsSyncStartDate;
+    el.innerHTML = dataAnteriorAoSync
+      ? `<div class="empty-state">Nenhuma notícia salva para essa data — nosso histórico de notícias começou a ser registrado em ${fmtDateBR(newsSyncStartDate)}.</div>`
+      : `<div class="empty-state">Sem notícia nos últimos ${NEWS_WINDOW_FALLBACK_DAYS} dias.</div>`;
+    return;
+  }
+  el.innerHTML = rows
+    .map(
+      (n) => `<div class="news-item">
+        <span class="news-tag">${fmtNewsDate(n.published_at)}</span>
+        <div class="news-body">
+          <a class="news-title" href="${escapeHtml(n.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(n.title)}</a>
+          <span class="news-source">${escapeHtml(n.source)}</span>
+        </div>
+      </div>`
+    )
+    .join("");
+}
+
+// ---------------------------------------------------------------------------
 // Recorte por data: tudo na tela e uma funcao pura de "ate qual dia olhar"
 // ---------------------------------------------------------------------------
 function sliceUpTo(series, dateIso) {
@@ -555,11 +649,14 @@ function renderForDate(dateIso) {
     { label: "US Treasury 5Y (%)", series: sliceUpTo(treasurySeriesById["DGS5"] ?? [], dateIso) },
     { label: "US Treasury 10Y (%)", series: sliceUpTo(treasurySeriesById["DGS10"] ?? [], dateIso) },
   ]);
+
+  fetchNews(dateIso).then((rows) => renderNews(rows, dateIso));
 }
 
 async function boot() {
   try {
     [instruments, sharesByTicker] = await Promise.all([fetchInstruments(), fetchSharesOutstanding()]);
+    newsSyncStartDate = await fetchNewsSyncStartDate();
 
     seriesByTicker = {};
     await Promise.all(
